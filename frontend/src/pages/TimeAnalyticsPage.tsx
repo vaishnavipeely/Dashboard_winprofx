@@ -1,14 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from 'recharts'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { Card } from '../components/ui/Card'
+import { fetchTime } from '../lib/api'
 import { mockTime } from '../data/mock'
 
 const PIE_COLORS = ['#22d3ee', '#a78bfa', '#34d399']
 
 export function TimeAnalyticsPage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockTime(filters), [filters])
+  const [data, setData] = useState<any>(() => mockTime(filters))
+
+  useEffect(() => {
+    fetchTime(filters).then(setData).catch(() => setData(mockTime(filters)))
+  }, [filters])
 
   const byHour = data?.charts?.tradesByHour ?? []
   const byDow = (data?.charts?.tradesByDayOfWeek ?? []).map((r: any) => ({ ...r, day: dowLabel(r.dow) }))

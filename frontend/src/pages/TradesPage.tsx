@@ -1,15 +1,20 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, LineChart, Line } from 'recharts'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { KpiCard } from '../components/ui/KpiCard'
 import { Card } from '../components/ui/Card'
+import { fetchTrades } from '../lib/api'
 import { mockTrades } from '../data/mock'
 
 const PIE_COLORS = ['#22d3ee', '#a78bfa', '#34d399', '#fbbf24', '#fb7185', '#60a5fa']
 
 export function TradesPage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockTrades(filters), [filters])
+  const [data, setData] = useState<any>(() => mockTrades(filters))
+
+  useEffect(() => {
+    fetchTrades(filters).then(setData).catch(() => setData(mockTrades(filters)))
+  }, [filters])
 
   const k = data?.kpis ?? {}
   const buySell = data?.charts?.buySell ?? []

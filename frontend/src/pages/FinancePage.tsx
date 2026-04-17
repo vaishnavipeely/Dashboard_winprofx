@@ -1,14 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from 'recharts'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { KpiCard } from '../components/ui/KpiCard'
 import { Card } from '../components/ui/Card'
 import { downloadCsv, downloadXlsx } from '../lib/export'
+import { fetchFinance } from '../lib/api'
 import { mockFinance } from '../data/mock'
 
 export function FinancePage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockFinance(filters), [filters])
+  const [data, setData] = useState<any>(() => mockFinance(filters))
+
+  useEffect(() => {
+    fetchFinance(filters).then(setData).catch(() => setData(mockFinance(filters)))
+  }, [filters])
 
   const k = data?.kpis ?? {}
   const trend = data?.charts?.cashflowTrend ?? []

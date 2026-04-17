@@ -1,14 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { KpiCard } from '../components/ui/KpiCard'
 import { Card } from '../components/ui/Card'
 import { DataTable } from '../components/ui/DataTable'
+import { fetchRisk } from '../lib/api'
 import { mockRisk } from '../data/mock'
 
 export function RiskPage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockRisk(filters), [filters])
+  const [data, setData] = useState<any>(() => mockRisk(filters))
+
+  useEffect(() => {
+    fetchRisk(filters).then(setData).catch(() => setData(mockRisk(filters)))
+  }, [filters])
 
   const k = data?.kpis ?? {}
   const equity = data?.charts?.equityCurve ?? []

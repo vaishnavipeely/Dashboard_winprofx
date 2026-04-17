@@ -1,12 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { Card } from '../components/ui/Card'
+import { fetchInstruments } from '../lib/api'
 import { mockInstruments } from '../data/mock'
 
 export function InstrumentsPage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockInstruments(filters), [filters])
+  const [data, setData] = useState<any>(() => mockInstruments(filters))
+
+  useEffect(() => {
+    fetchInstruments(filters).then(setData).catch(() => setData(mockInstruments(filters)))
+  }, [filters])
 
   const mostTraded = data?.charts?.mostTraded ?? []
   const volume = data?.charts?.volumePerInstrument ?? []

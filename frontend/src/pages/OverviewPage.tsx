@@ -1,21 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 import { Activity, DollarSign, Users } from 'lucide-react'
 import { FiltersBar, type Filters } from '../components/ui/FiltersBar'
 import { KpiCard } from '../components/ui/KpiCard'
 import { Card } from '../components/ui/Card'
+import { fetchOverview } from '../lib/api'
 import { mockOverview } from '../data/mock'
 
 const PIE_COLORS = ['#22d3ee', '#a78bfa', '#34d399', '#fbbf24', '#fb7185', '#60a5fa', '#f472b6', '#94a3b8']
 
 export function OverviewPage() {
   const [filters, setFilters] = useState<Filters>({})
-  const data = useMemo(() => mockOverview(filters), [filters])
+  const [data, setData] = useState<any>(() => mockOverview(filters))
+
+  useEffect(() => {
+    fetchOverview(filters).then(setData).catch(() => setData(mockOverview(filters)))
+  }, [filters])
 
   const k = data?.kpis ?? {}
   const charts = data?.charts ?? {}
 
-  const volumePie = useMemo(() => (Array.isArray(charts.volumeDistribution) ? charts.volumeDistribution : []), [charts])
+  const volumePie: any[] = Array.isArray(charts.volumeDistribution) ? charts.volumeDistribution : []
 
   return (
     <div className="space-y-4">
